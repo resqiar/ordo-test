@@ -47,31 +47,36 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @foreach ($data as $book)
                         <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                1
+                                {{$book->id}}
                             </th>
                             <td class="px-6 py-4">
-
+                                @if($book->image_path)
+                                <img src="{{ asset('uploads/' . $book->image_path) }}" alt="{{ $book->name }} cover" width="200" height=300" />
+                                @endif
                             </td>
                             <td class="font-bold px-6 py-4">
-                                Laskar Pelangi
+                                {{$book->name}}
                             </td>
                             <td class="px-6 py-4">
-                                Gunawan
+                                {{$book->author}}
                             </td>
                             <td class="px-6 py-4">
-                                Drafted
+                                {{$book->status}}
                             </td>
                             <td class="px-6 py-4">
+                                @if ($book->status == "Published")
                                 <!-- See Details Button -->
-                                <button type="button" class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm p-1 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                                <a href="/book/{{$book->id}}" class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm p-1 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
                                     <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                         <path stroke="currentColor" stroke-width="2" d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z" />
                                         <path stroke="currentColor" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                     </svg>
                                     <span class="sr-only">See Details</span>
-                                </button>
+                                </a>
+                                @endif
 
                                 <!-- Edit Button -->
                                 <button type="button" class="text-white bg-amber-700 hover:bg-amber-800 focus:ring-4 focus:outline-none focus:ring-amber-300 font-medium rounded-lg text-sm p-1 text-center inline-flex items-center dark:bg-amber-600 dark:hover:bg-amber-700 dark:focus:ring-amber-800">
@@ -81,6 +86,7 @@
                                     <span class="sr-only">Edit</span>
                                 </button>
 
+                                @if ($book->status != "Archived")
                                 <!-- Delete Button -->
                                 <button type="button" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-1 text-center inline-flex items-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
                                     <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -88,8 +94,10 @@
                                     </svg>
                                     <span class="sr-only">Delete</span>
                                 </button>
+                                @endif
                             </td>
                         </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
