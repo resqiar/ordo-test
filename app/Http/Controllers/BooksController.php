@@ -24,6 +24,12 @@ class BooksController extends Controller
         return view("index", ["data" => $books]);
     }
 
+    public function detail($id)
+    {
+        $book = Book::where("id", $id)->whereNot("status", "Draft")->firstOrFail();
+        return view("detail", ["data" => $book]);
+    }
+
     public function create(HtmxRequest $request)
     {
         $validator = Validator::make($request->all(), [

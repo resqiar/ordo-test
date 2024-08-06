@@ -67,7 +67,7 @@
                                 {{$book->status}}
                             </td>
                             <td class="px-6 py-4">
-                                @if ($book->status == "Published")
+                                @if ($book->status != "Draft")
                                 <!-- See Details Button -->
                                 <a href="/book/{{$book->id}}" class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm p-1 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
                                     <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
