@@ -39,6 +39,31 @@ class BooksController extends Controller
         return view("edit", ["data" => $book]);
     }
 
+    public function search(HtmxRequest $request)
+    {
+        $keyword = $request->query("q");
+
+        try {
+            if ($keyword) {
+                // match keyword with name or author
+                $books = Book::whereRaw("MATCH(name, author) AGAINST(? IN NATURAL LANGUAGE MODE)", [$keyword])->get();
+            } else {
+                $books = Book::all();
+            }
+
+            if ($books->count() > 0) {
+                return view("components.book-table", ["data" => $books]);
+            } else {
+                return view("components.notfound-alert", ["message" => "Book with that keyword is not found, try another."]);
+            }
+        } catch (\Exception $e) {
+            dump($e);
+            return response()->view("components.error-alert", [
+                "error" => new MessageBag(["Something went wrong, please try again later."])
+            ]);
+        }
+    }
+
     public function create(HtmxRequest $request)
     {
         $validator = Validator::make($request->all(), [

@@ -11,6 +11,7 @@ Route::get("/create", function () {
     return view("create");
 });
 
+Route::get("/search", [BooksController::class, "search"]);
 Route::post("/create", [BooksController::class, "create"]);
 Route::post("/edit/{id}", [BooksController::class, "edit"]);
 Route::delete("/delete/{id}", [BooksController::class, "delete"]);
