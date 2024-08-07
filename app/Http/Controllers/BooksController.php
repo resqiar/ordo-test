@@ -120,7 +120,7 @@ class BooksController extends Controller
             $book = Book::findOrFail($id);
 
             // delete old image from the disk
-            if ($book->image_path) {
+            if ($path && $book->image_path) {
                 Storage::disk("uploads")->delete($book->image_path);
             }
 
@@ -138,7 +138,8 @@ class BooksController extends Controller
             // but i dont have much more time to research on that.
             $book->save();
 
-            return new HtmxResponseClientRefresh();
+            // redirect back as a response back to "/"
+            return new HtmxResponseClientRedirect("/");
         } catch (ModelNotFoundException $e) {
             dump($e);
             return response()->view("components.error-alert", [

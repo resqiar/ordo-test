@@ -16,7 +16,7 @@
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-16">
                     <div class="shrink-0 max-w-md lg:max-w-lg mx-auto">
                         @if($data->image_path)
-                        <img class="w-full hidden dark:block" src="{{ asset('uploads/' . $data->image_path) }}" alt="{{ $data->name }}" />
+                        <img class="w-full" src="{{ asset('uploads/' . $data->image_path) }}" alt="{{ $data->name }}" />
                         @endif
                     </div>
 
@@ -37,9 +37,9 @@
 
                         <hr class="my-6 md:my-8 border-gray-200 dark:border-gray-800" />
 
-                        <p class="mb-6 text-gray-500 dark:text-gray-400">
+                        <div class="mb-6 text-gray-500 dark:text-gray-400 whitespace-pre-line">
                             {{ $data->description }}
-                        </p>
+                        </div>
                     </div>
                 </div>
             </div>
