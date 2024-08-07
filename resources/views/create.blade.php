@@ -42,7 +42,7 @@
                             <option value="Published">Published</option>
                             <option value="Archived">Archived</option>
                         </select>
-                        <label for="status" class="block mt-2 text-xs">Only published books will have unique url, drafted books will not be able to be deleted.</label>
+                        <label for="status" class="block mt-2 text-xs">Only published book will have unique url, archived book will not be able to be deleted.</label>
                     </div>
                     <!-- Dropzone Input -->
                     <div class="flex flex-col w-full">
