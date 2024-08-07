@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\Rules\Enum;
@@ -18,16 +20,22 @@ enum BookStatus: string
 
 class BooksController extends Controller
 {
-    public function index()
+    public function indexPage()
     {
         $books = Book::all();
         return view("index", ["data" => $books]);
     }
 
-    public function detail($id)
+    public function detailPage($id)
     {
         $book = Book::where("id", $id)->whereNot("status", "Draft")->firstOrFail();
         return view("detail", ["data" => $book]);
+    }
+
+    public function editPage($id)
+    {
+        $book = Book::find($id);
+        return view("edit", ["data" => $book]);
     }
 
     public function create(HtmxRequest $request)
@@ -79,6 +87,66 @@ class BooksController extends Controller
                     "error" => new MessageBag(["Something went wrong, please try again later."])
                 ]);
             }
+        }
+    }
+
+    public function edit($id, HtmxRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "book_name" => "required|string|max:100",
+            "book_description" => "string|nullable",
+            "book_author" => "required|string|max:100",
+            "book_status" => ["required", "string", new Enum(BookStatus::class)],
+            "book_cover" => "nullable|image|mimes:jpeg,png,jpg,gif|max:5048",
+        ]);
+
+        if ($validator->fails()) {
+            return response()->view("components.error-alert", [
+                "error" => $validator->errors()
+            ]);
+        }
+
+        $path = "";
+
+        // if there is a cover file, save it to the local storage.
+        // iam going to make an arbitrary folder in public/uploads/media.
+        // get the unique path and we are good to go.
+        if ($request->hasFile("book_cover")) {
+            $path = $request->file("book_cover")->store("media", "uploads");
+        }
+
+        try {
+            $book = Book::findOrFail($id);
+
+            // delete old image from the disk
+            Storage::disk("uploads")->delete($book->image_path);
+
+            // update attr
+            $book->name = $request->input("book_name");
+            $book->description = $request->input("book_description", "");
+            $book->author = $request->input("book_author");
+            $book->status = $request->input("book_status");
+            if ($path) {
+                $book->image_path = $path;
+            }
+
+            // save the attr.
+            // ideally i need to make a transaction for this type of op, 
+            // but i dont have much more time to research on that.
+            $book->save();
+
+            // redirect back as a response back to "/"
+            return new HtmxResponseClientRedirect("/");
+        } catch (ModelNotFoundException $e) {
+            dump($e);
+            return response()->view("components.error-alert", [
+                "error" => new MessageBag(["Book Not Found"])
+            ]);
+        } catch (\Exception $e) {
+            dump($e);
+            return response()->view("components.error-alert", [
+                "error" => new MessageBag(["Something went wrong, please try again later."])
+            ]);
         }
     }
 }
