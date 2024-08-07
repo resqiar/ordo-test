@@ -13,3 +13,4 @@ Route::get("/create", function () {
 
 Route::post("/create", [BooksController::class, "create"]);
 Route::post("/edit/{id}", [BooksController::class, "edit"]);
+Route::delete("/delete/{id}", [BooksController::class, "delete"]);

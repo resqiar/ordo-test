@@ -10,6 +10,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Validation\Rules\Enum;
 use Mauricius\LaravelHtmx\Http\HtmxRequest;
 use Mauricius\LaravelHtmx\Http\HtmxResponseClientRedirect;
+use Mauricius\LaravelHtmx\Http\HtmxResponseClientRefresh;
 
 enum BookStatus: string
 {
@@ -119,7 +120,9 @@ class BooksController extends Controller
             $book = Book::findOrFail($id);
 
             // delete old image from the disk
-            Storage::disk("uploads")->delete($book->image_path);
+            if ($book->image_path) {
+                Storage::disk("uploads")->delete($book->image_path);
+            }
 
             // update attr
             $book->name = $request->input("book_name");
@@ -135,8 +138,44 @@ class BooksController extends Controller
             // but i dont have much more time to research on that.
             $book->save();
 
+            return new HtmxResponseClientRefresh();
+        } catch (ModelNotFoundException $e) {
+            dump($e);
+            return response()->view("components.error-alert", [
+                "error" => new MessageBag(["Book Not Found"])
+            ]);
+        } catch (\Exception $e) {
+            dump($e);
+            return response()->view("components.error-alert", [
+                "error" => new MessageBag(["Something went wrong, please try again later."])
+            ]);
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            $book = Book::findOrFail($id);
+
+            // if book is archived, prevent it from deleted.
+            if ($book->status == "Archived") {
+                return response()->view("components.error-alert", [
+                    "error" => new MessageBag(["Book is archived and can't be deleted."])
+                ]);
+            }
+
+            // delete old image from the disk (if any)
+            if ($book->image_path) {
+                Storage::disk("uploads")->delete($book->image_path);
+            }
+
+            // delete op.
+            // ideally i need to make a transaction for this type of op, 
+            // but i dont have much more time to research on that.
+            $book->delete();
+
             // redirect back as a response back to "/"
-            return new HtmxResponseClientRedirect("/");
+            return new HtmxResponseClientRefresh();
         } catch (ModelNotFoundException $e) {
             dump($e);
             return response()->view("components.error-alert", [
